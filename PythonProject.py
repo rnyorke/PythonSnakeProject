@@ -1,5 +1,3 @@
-#Python 
-
 from Tkinter import *
 
 def mousePressed(event):
@@ -9,32 +7,45 @@ def mousePressed(event):
 def keyPressed(event):
     canvas = event.widget.canvas
     #movement
-    if (event.keysym == "Up"):
-        moveSnake(canvas,-1,0)
-    elif (event.keysym == "Down"):
-        moveSnake(canvas, 1, 0)
-    elif (event.keysym == "Left"):
-        moveSnake(canvas, 0, -1)
-    elif (event.keysym == "Right"):
-        moveSnake(canvas, 0, 1)
+    # first process keys that work even if the game is over
+    #quitting the game
+    if (event.char == "q"):
+        gameOver(canvas)
+    #resetting
+    elif (event.char == "r"):
+        init(canvas)
+    if (canvas.data["isGameOver"] == False):
+        if (event.keysym == "Up"):
+            moveSnake(canvas,-1,0)
+        elif (event.keysym == "Down"):
+            moveSnake(canvas, 1, 0)
+        elif (event.keysym == "Left"):
+            moveSnake(canvas, 0, -1)
+        elif (event.keysym == "Right"):
+            moveSnake(canvas, 0, 1)
     redrawAll(canvas)
-
+    
 def moveSnake(canvas, drow, dcol):
     # moving the snake by integer on llist board
-    
     snakeBoard = canvas.data["snakeBoard"]
-    #recent head position
+    rows = len(snakeBoard)
+    cols = len(SnakeBoard[0])
     headRow = canvas.data["headRow"]
     headCol = canvas.data["headCol"]
-    #variables to help with the next steps... placing the new head of the snake
     newHeadRow = headRow + drow
     newHeadCol = headCol + dcol
-    #giving head a new integer to represent it
-    snakeBoard[newHeadRow][newHeadCol] = 1 + snakeBoard[headRow][headCol];
-    canvas.data["headRow"] = newHeadRow
-    canvas.data["headCol"] = newHeadCol
-    #calling removeTail to make the snake seem as if moving by adding a head, and subrtacting a tail
-    removeTail(canvas)
+    if ((newHeadRow < 0) or (newHeadRow >= rows) or
+        (newHeadCol < 0) or (newHeadCol >= cols)):
+        gameOver(canvas)
+    elif (snakeBoard[newHeadRow][newHeadCol] > 0):
+        gameOver(canvas)
+    else:
+        snakeBoard[newHeadRow][newHeadCol] = 1 + snakeBoard[headRow][headCol];
+        canvas.data["headRow"] = newHeadRow
+        canvas.data["headCol"] = newHeadCol
+        removeTail(canvas)
+
+
     
 def removeTail(canvas):
     # find every snake cell and subtract 1 from it.  When we're done,
@@ -52,10 +63,12 @@ def removeTail(canvas):
             if (snakeBoard[row][col] > 0):
                 snakeBoard[row][col] -= 1
                 
-                
+def gameOver(canvas):
+    canvas.data["isGameOver"] = True             
                 
 def timerFired(canvas):
-    redrawAll(canvas)
+    if (canvas.data["isGameOver"] == False):
+        redrawAll(canvas)
     delay = 250 # milliseconds
     canvas.after(delay, timerFired, canvas) # pause, then call timerFired again
 
@@ -91,7 +104,7 @@ def drawSnakeCell(canvas, snakeBoard, row, col):
     if (snakeBoard[row][col] > 0):
         # drawing part of the snake body
         canvas.create_oval(left, top, right, bottom, fill="blue")
-    return
+
 
 def loadSnakeBoard(canvas):
     # 2d Integer List Board
@@ -113,6 +126,7 @@ def loadSnakeBoard(canvas):
     
 def findSnakeHead(canvas):
     #variables dealing with how to find the snake head through finding highest integer and storing as head's row and column
+    snakeBoard = canvas.data["snakeBoard"]
     rows = len(snakeBoard)
     cols = len(snakeBoard[0])
     headRow = 0
@@ -138,6 +152,7 @@ def printInstructions():
 def init(canvas):
     printInstructions()
     loadSnakeBoard(canvas)
+    canvas.data["isGameOver"] = False
     redrawAll(canvas)
 
 def run():
