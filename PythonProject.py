@@ -37,7 +37,7 @@ def drawSnakeCell(canvas, snakeBoard, row, col):
     return
 
 def loadSnakeBoard(canvas):
-    # you write this!
+    # 2d Integer List Board
     snakeBoard = [ [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
@@ -50,14 +50,19 @@ def loadSnakeBoard(canvas):
                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
                 ]
     canvas.data["snakeBoard"] = snakeBoard
-    # allocate the new snakeBoard 2d list as described
+
     # in the notes, and store it in the canvas's data
     # dictionary
     return
 
 def printInstructions():
-    # you write this!
-    # print the instructions
+    #print the instructions
+    print "Snake!"
+    print "Use the Arrow Keys to move the snake!"
+    print "Eat food to grow!"
+    print "Stay on the board..."
+    print "And don't crash into yourself :)"
+
     return
 
 def init(canvas):
