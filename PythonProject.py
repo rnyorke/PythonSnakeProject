@@ -112,9 +112,18 @@ def loadSnakeBoard(canvas):
     
     
 def findSnakeHead(canvas):
+    #variables dealing with how to find the snake head through finding highest integer and storing as head's row and column
     rows = len(snakeBoard)
-    columns = len(snakeBoard[0])
-    
+    cols = len(snakeBoard[0])
+    headRow = 0
+    headCol = 0
+    for row in range(rows):
+        for col in range(cols):
+            if (snakeBoard[row][col] > snakeBoard[headRow][headCol]):
+                headRow = row
+                headCol = col
+    canvas.data["headRow"] = headRow
+    canvas.data["headCol"] = headCol
     
     
 def printInstructions():
@@ -124,15 +133,12 @@ def printInstructions():
     print "Eat food to grow!"
     print "Stay on the board..."
     print "And don't crash into yourself :)"
-
     return
 
 def init(canvas):
     printInstructions()
     loadSnakeBoard(canvas)
     redrawAll(canvas)
-
-########### copy-paste below here ###########
 
 def run():
     root = Tk()
