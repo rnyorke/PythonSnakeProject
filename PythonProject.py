@@ -29,7 +29,7 @@ def moveSnake(canvas, drow, dcol):
     # moving the snake by integer on llist board
     snakeBoard = canvas.data["snakeBoard"]
     rows = len(snakeBoard)
-    cols = len(SnakeBoard[0])
+    cols = len(snakeBoard[0])
     headRow = canvas.data["headRow"]
     headCol = canvas.data["headCol"]
     newHeadRow = headRow + drow
