@@ -1,3 +1,4 @@
+import random
 from Tkinter import *
 
 def mousePressed(event):
@@ -39,14 +40,18 @@ def moveSnake(canvas, drow, dcol):
         gameOver(canvas)
     elif (snakeBoard[newHeadRow][newHeadCol] > 0):
         gameOver(canvas)
+    elif (snakeBoard[newHeadRow][newHeadCol] < 0):
+        snakeBoard[newHeadRow][newHeadCol] = 1 + snakeBoard[headRow][headCol];
+        canvas.data["headRow"] = newHeadRow
+        canvas.data["headCol"] = newHeadCol
+        placeFood(canvas)
     else:
         snakeBoard[newHeadRow][newHeadCol] = 1 + snakeBoard[headRow][headCol];
         canvas.data["headRow"] = newHeadRow
         canvas.data["headCol"] = newHeadCol
         removeTail(canvas)
 
-
-    
+   
 def removeTail(canvas):
     # find every snake cell and subtract 1 from it.  When we're done,
     # the old tail (which was 1) will become 0, so will not be part of the snake.
@@ -104,7 +109,9 @@ def drawSnakeCell(canvas, snakeBoard, row, col):
     if (snakeBoard[row][col] > 0):
         # drawing part of the snake body
         canvas.create_oval(left, top, right, bottom, fill="blue")
-
+    elif (snakeBoard[row][col] < 0):
+        # draw food
+        canvas.create_oval(left, top, right, bottom, fill="green")
 
 def loadSnakeBoard(canvas):
     # 2d Integer List Board
@@ -114,16 +121,30 @@ def loadSnakeBoard(canvas):
                    [ 0, 0, 0, 0, 4, 5, 6, 0, 0, 0 ],
                    [ 0, 0, 0, 0, 3, 0, 7, 0, 0, 0 ],
                    [ 0, 0, 0, 1, 2, 0, 8, 0, 0, 0 ],
-                   [ 0, 0, 0, 0, 0, 0, 9, 0, 0, 0 ],
+                   [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
                 ]
     canvas.data["snakeBoard"] = snakeBoard
     findSnakeHead(canvas)
-    return
+    placeFood(canvas)
     
+def placeFood(canvas): 
+    # place food (-1) in a random location on the snakeBoard, but
+    # keep picking random locations until we find one that is not
+    # part of the snake!
+    snakeBoard = canvas.data["snakeBoard"]
+    rows = len(snakeBoard)
+    cols = len(snakeBoard[0])
+    while True:
+        row = random.randint(0,rows-1)
+        col = random.randint(0,cols-1)
+        if (snakeBoard[row][col] == 0):
+            break
+    snakeBoard[row][col] = -1 
     
+      
 def findSnakeHead(canvas):
     #variables dealing with how to find the snake head through finding highest integer and storing as head's row and column
     snakeBoard = canvas.data["snakeBoard"]
