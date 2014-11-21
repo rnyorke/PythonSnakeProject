@@ -8,11 +8,8 @@ def mousePressed(event):
 def keyPressed(event):
     canvas = event.widget.canvas
     #movement
-    # first process keys that work even if the game is over
-    #quitting the game
     if (event.char == "q"):
         gameOver(canvas)
-    #resetting
     elif (event.char == "r"):
         init(canvas)
     if (canvas.data["isGameOver"] == False):
@@ -28,6 +25,8 @@ def keyPressed(event):
     
 def moveSnake(canvas, drow, dcol):
     # moving the snake by integer on llist board
+    canvas.data["snakeDrow"] = drow # store direction for next timer event
+    canvas.data["snakeDcol"] = dcol
     snakeBoard = canvas.data["snakeBoard"]
     rows = len(snakeBoard)
     cols = len(snakeBoard[0])
@@ -51,13 +50,11 @@ def moveSnake(canvas, drow, dcol):
         canvas.data["headCol"] = newHeadCol
         removeTail(canvas)
 
+
    
 def removeTail(canvas):
     # find every snake cell and subtract 1 from it.  When we're done,
-    # the old tail (which was 1) will become 0, so will not be part of the snake.
-    # So the snake shrinks by 1 value, the tail.
-    
-    #of snakeboard in canvas data
+    # the old tail (which was 1) will become 0
     snakeBoard = canvas.data["snakeBoard"]
     #setting up the rowas and columns of the board
     rows = len(snakeBoard)
@@ -73,19 +70,20 @@ def gameOver(canvas):
                 
 def timerFired(canvas):
     if (canvas.data["isGameOver"] == False):
+        drow = canvas.data["snakeDrow"]
+        dcol = canvas.data["snakeDcol"]
+        moveSnake(canvas,drow,dcol)
         redrawAll(canvas)
     delay = 250 # milliseconds
     canvas.after(delay, timerFired, canvas) # pause, then call timerFired again
 
+    # whether or not game is over, call next timerFired
+    # (or we'll never call timerFired again!)
 def redrawAll(canvas):
     canvas.delete(ALL)
     drawSnakeBoard(canvas)
 
 def drawSnakeBoard(canvas):
-    # you write this!
-    # hint: for every row,col position on the board, call
-    # drawSnakeCell, a helper method you will also write, like so
-    #    drawSnakeCell(canvas, snakeBoard, row, col)
     snakeBoard = canvas.data["snakeBoard"]
     rows = len(snakeBoard)
     cols = len(snakeBoard[0])
@@ -96,21 +94,14 @@ def drawSnakeBoard(canvas):
 def drawSnakeCell(canvas, snakeBoard, row, col):
     margin = 5
     cellSize = 30
-    # you write this!
-    # hint: place a margin 5-pixels-wide around the board.
-    # make each cell 30x30
-    # draw a white square and then, if the snake is in the
-    # cell, draw a blue circle.
     left = margin + col * cellSize
     right = left + cellSize
     top = margin + row * cellSize
     bottom = top + cellSize
     canvas.create_rectangle(left, top, right, bottom, fill="white")
     if (snakeBoard[row][col] > 0):
-        # drawing part of the snake body
         canvas.create_oval(left, top, right, bottom, fill="blue")
     elif (snakeBoard[row][col] < 0):
-        # draw food
         canvas.create_oval(left, top, right, bottom, fill="green")
 
 def loadSnakeBoard(canvas):
@@ -118,9 +109,9 @@ def loadSnakeBoard(canvas):
     snakeBoard = [ [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-                   [ 0, 0, 0, 0, 4, 5, 6, 0, 0, 0 ],
-                   [ 0, 0, 0, 0, 3, 0, 7, 0, 0, 0 ],
-                   [ 0, 0, 0, 1, 2, 0, 8, 0, 0, 0 ],
+                   [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+                   [ 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 ],
+                   [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
                    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
@@ -168,14 +159,17 @@ def printInstructions():
     print "Eat food to grow!"
     print "Stay on the board..."
     print "And don't crash into yourself :)"
+    print "Press "R" to Restart"
     return
 
 def init(canvas):
     printInstructions()
     loadSnakeBoard(canvas)
     canvas.data["isGameOver"] = False
+    canvas.data["snakeDrow"] = 0
+    canvas.data["snakeDcol"] = -1
     redrawAll(canvas)
-
+    
 def run():
     root = Tk()
     canvas = Canvas(root, width=310, height=310)
